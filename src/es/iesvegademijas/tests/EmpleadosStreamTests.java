@@ -3,6 +3,7 @@ package es.iesvegademijas.tests;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,6 @@ import static java.util.stream.Collectors.*;
 import static java.util.Comparator.*;
 
 import es.iesvegademijas.streams.*;
-
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Test;
@@ -116,8 +116,13 @@ class EmpleadosStreamTests {
 			
 			
 			//
+			List<Integer> lista = listEmp.stream()
+					.filter(e -> e.getDepartamento()!= null)
+					.map(e -> e.getDepartamento().getCodigo())
+					.distinct()
+					.collect(toList());
 			
-			listEmp.forEach(System.out::println);
+			lista.forEach(System.out::println);
 		
 			empHome.commitTransaction();
 		}
@@ -133,7 +138,7 @@ class EmpleadosStreamTests {
 	 * 
 	 */
 	@Test
-	void test2() {
+	void test2a() {
 	
 		EmpleadoHome empHome = new EmpleadoHome();	
 		try {
@@ -143,8 +148,11 @@ class EmpleadosStreamTests {
 			
 			
 			//
+			List<String> lista = listEmp.stream()
+					.map(e -> e.getNombre() + " " + e.getApellido1() + " " + e.getApellido2())
+					.collect(toList());
 			
-			listEmp.forEach(System.out::println);
+			lista.forEach(System.out::println);
 		
 			empHome.commitTransaction();
 		}
@@ -161,7 +169,7 @@ class EmpleadosStreamTests {
 	 */
 	
 	@Test
-	void test3() {
+	void test3a() {
 	
 		EmpleadoHome empHome = new EmpleadoHome();	
 		try {
@@ -171,8 +179,11 @@ class EmpleadosStreamTests {
 			
 			
 			//
+			List<String> lista = listEmp.stream()
+					.map(e -> e.getCodigo() + " " + e.getNif().substring(0,8))
+					.collect(toList());
 			
-			listEmp.forEach(System.out::println);
+			lista.forEach(System.out::println);
 		
 			empHome.commitTransaction();
 		}
@@ -188,7 +199,8 @@ class EmpleadosStreamTests {
 	 * Para calcular este dato tendrá que restar al valor del presupuesto inicial (columna presupuesto) los gastos que se han generado (columna gastos).
 	 *  Tenga en cuenta que en algunos casos pueden existir valores negativos.
 	 */
-	void test4() {
+	@Test
+	void test4a() {
 		
 		DepartamentoHome depHome = new DepartamentoHome();
 		
@@ -198,8 +210,16 @@ class EmpleadosStreamTests {
 			List<Departamento> listDep = depHome.findAll();
 			
 			//
+			List<String> lista = listDep.stream()
+					.map(d -> new Departamento(
+							d.getNombre(),
+							d.getPresupuesto(),
+							d.getGastos(),
+							d.getEmpleados()))
+					.map(d -> "Nombre: " + d.getNombre() + " ,Presupuesto actual: " + (d.getPresupuesto()-d.getGastos()))
+					.collect(toList());
 			
-			listDep.forEach(System.out::println);
+			lista.forEach(System.out::println);
 		
 			depHome.commitTransaction();
 		}
@@ -212,7 +232,8 @@ class EmpleadosStreamTests {
 	/**
 	 * 5. Lista el nombre de los departamentos y el valor del presupuesto actual ordenado de forma ascendente.
 	 */
-	void test5() {
+	@Test
+	void test5a() {
 		
 		DepartamentoHome depHome = new DepartamentoHome();
 		
@@ -236,6 +257,7 @@ class EmpleadosStreamTests {
 	/**
 	 * 6. Devuelve una lista con el nombre y el presupuesto, de los 3 departamentos que tienen mayor presupuesto
 	 */
+	@Test
 	void test6() {
 		
 		DepartamentoHome depHome = new DepartamentoHome();
@@ -246,8 +268,13 @@ class EmpleadosStreamTests {
 			List<Departamento> listDep = depHome.findAll();
 			
 			//
+			List<String> lista = listDep.stream()
+					.sorted(comparing(Departamento::getPresupuesto, reverseOrder()))
+					.map(d -> d.getNombre() + "\t" + d.getPresupuesto())
+					.limit(3)
+					.collect(toList());
 			
-			listDep.forEach(System.out::println);
+			lista.forEach(System.out::println);
 		
 			depHome.commitTransaction();
 		}
@@ -260,6 +287,7 @@ class EmpleadosStreamTests {
 	/**
 	 * 7. Devuelve una lista con el nombre de los departamentos y el presupesto, de aquellos que tienen un presupuesto entre 100000 y 200000 euros
 	 */
+	@Test
 	void test7() {
 		
 		DepartamentoHome depHome = new DepartamentoHome();
@@ -270,8 +298,12 @@ class EmpleadosStreamTests {
 			List<Departamento> listDep = depHome.findAll();
 			
 			//
-			
-			listDep.forEach(System.out::println);
+			List<String> lista = listDep.stream()
+					.filter(d -> d.getPresupuesto() > 100000 && d.getPresupuesto() < 200000)
+					.map(d -> d.getNombre() + " " + d.getPresupuesto())
+					.collect(toList());
+				
+			lista.forEach(System.out::println);
 		
 			depHome.commitTransaction();
 		}
@@ -295,8 +327,13 @@ class EmpleadosStreamTests {
 			
 			
 			//
+			List<Empleado> lista = listEmp.stream()
+					.sorted(comparing(Empleado::getCodigo))
+					.skip(2)
+					.limit(5)
+					.collect(toList());
 			
-			listEmp.forEach(System.out::println);
+			lista.forEach(System.out::println);
 		
 			empHome.commitTransaction();
 		}
@@ -311,6 +348,7 @@ class EmpleadosStreamTests {
 	 * 9. Devuelve una lista con el nombre de los departamentos y el gasto, de aquellos que tienen menos de 5000 euros de gastos.
 	 * Ordenada de mayor a menor gasto.
 	 */
+	@Test
 	void test9() {
 		
 		DepartamentoHome depHome = new DepartamentoHome();
@@ -321,8 +359,12 @@ class EmpleadosStreamTests {
 			List<Departamento> listDep = depHome.findAll();
 			
 			//
+			List<String> lista = listDep.stream()
+					.filter(d -> d.getGastos() < 5000)
+					.map(d -> d.getNombre() + " " + d.getGastos())
+					.collect(toList());
 			
-			listDep.forEach(System.out::println);
+			lista.forEach(System.out::println);
 		
 			depHome.commitTransaction();
 		}
@@ -346,8 +388,12 @@ class EmpleadosStreamTests {
 			
 			
 			//
+			List<Empleado> lista = listEmp.stream()
+					.filter(e -> e.getApellido2()!= null)
+					.filter( e-> e.getApellido2().toUpperCase().equals("DÍAZ") || e.getApellido2().toUpperCase().equals("MORENO"))
+					.collect(toList());
 			
-			listEmp.forEach(System.out::println);
+			lista.forEach(System.out::println);
 		
 			empHome.commitTransaction();
 		}
@@ -362,7 +408,7 @@ class EmpleadosStreamTests {
 	 * 11. Lista los nombres, apellidos y nif de los empleados que trabajan en los departamentos 2, 4 o 5
 	 */
 	@Test
-	void test11() {
+	void test11a() {
 	
 		EmpleadoHome empHome = new EmpleadoHome();	
 		try {
@@ -399,8 +445,12 @@ class EmpleadosStreamTests {
 			
 			
 			//
+			List<String> lista = listEmp.stream()
+					.filter(e -> e.getNif().toUpperCase().equals("38382980M"))
+					.map(e -> e.getDepartamento().getNombre())
+					.collect(toList());
 			
-			listEmp.forEach(System.out::println);
+			lista.forEach(System.out::println);
 		
 			empHome.commitTransaction();
 		}
@@ -441,6 +491,7 @@ class EmpleadosStreamTests {
 	/**
 	 * 14. Calcula el valor mínimo del presupuesto de todos los departamentos.
 	 */
+	@Test
 	void test14() {
 		
 		DepartamentoHome depHome = new DepartamentoHome();
@@ -451,8 +502,14 @@ class EmpleadosStreamTests {
 			List<Departamento> listDep = depHome.findAll();
 			
 			//
+			Optional<Departamento> listFiltro = listDep.stream()
+					.collect(minBy(Comparator.comparing(Departamento::getPresupuesto)));
+			List<Double> lista = listFiltro.stream()
+					.map(d -> d.getPresupuesto())
+					.collect(toList());
+					
 			
-			listDep.forEach(System.out::println);
+			lista.forEach(System.out::println);
 		
 			depHome.commitTransaction();
 		}

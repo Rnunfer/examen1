@@ -61,9 +61,7 @@ public class Bag<T> {
 	public void remove(T elemento) {
 		int pos = buscarElemento(elemento);
 		if (pos != -1) {
-			lista.get(pos).eliminarCantidad(1);
-			if (lista.get(pos).getCantidad() <= 0)
-				lista.remove(pos);
+			lista.remove(pos);
 		}
 	}
 	
@@ -97,6 +95,12 @@ public class Bag<T> {
 		 Bag bolsa = new Bag();
 		 bolsa.add("Hola");
 		 bolsa.add(5, 5);
+		 bolsa.remove(3);
+		 bolsa.add(3, 3);
+		 bolsa.remove(3, 2);
+		 bolsa.add("HWEY", 2);
+		 bolsa.remove("HWEY");
+		 System.out.println(bolsa.size());
 		 System.out.println(bolsa.toString());
 	}
 }

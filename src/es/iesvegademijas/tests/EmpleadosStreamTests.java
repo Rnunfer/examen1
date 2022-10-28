@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
@@ -117,7 +118,16 @@ class EmpleadosStreamTests {
 			
 			//
 			List<Integer> lista = listEmp.stream()
-					.filter(e -> e.getDepartamento()!= null)
+					.map(e -> new Empleado(
+							e.getDepartamento(),
+							e.getNif(),
+							e.getNombre(),
+							e.getApellido1(),
+							e.getApellido2()))
+					/*.map( e -> {
+						if(e.getApellido2() == null)
+							e.setApellido2()
+					;})*/
 					.map(e -> e.getDepartamento().getCodigo())
 					.distinct()
 					.collect(toList());
@@ -138,7 +148,7 @@ class EmpleadosStreamTests {
 	 * 
 	 */
 	@Test
-	void test2a() {
+	void test2() {
 	
 		EmpleadoHome empHome = new EmpleadoHome();	
 		try {
@@ -169,7 +179,7 @@ class EmpleadosStreamTests {
 	 */
 	
 	@Test
-	void test3a() {
+	void test3() {
 	
 		EmpleadoHome empHome = new EmpleadoHome();	
 		try {
@@ -200,7 +210,7 @@ class EmpleadosStreamTests {
 	 *  Tenga en cuenta que en algunos casos pueden existir valores negativos.
 	 */
 	@Test
-	void test4a() {
+	void test4() {
 		
 		DepartamentoHome depHome = new DepartamentoHome();
 		
@@ -216,7 +226,13 @@ class EmpleadosStreamTests {
 							d.getPresupuesto(),
 							d.getGastos(),
 							d.getEmpleados()))
-					.map(d -> "Nombre: " + d.getNombre() + " ,Presupuesto actual: " + (d.getPresupuesto()-d.getGastos()))
+					.map(d -> {
+							d.setPresupuesto(d.getPresupuesto()-d.getGastos());
+							if(d.getPresupuesto()<0)
+								d.setPresupuesto(0);
+							return d;
+					})
+					.map(d -> "Nombre: " + d.getNombre() + " ,Presupuesto actual: " + d.getPresupuesto())
 					.collect(toList());
 			
 			lista.forEach(System.out::println);
@@ -233,7 +249,7 @@ class EmpleadosStreamTests {
 	 * 5. Lista el nombre de los departamentos y el valor del presupuesto actual ordenado de forma ascendente.
 	 */
 	@Test
-	void test5a() {
+	void test5() {
 		
 		DepartamentoHome depHome = new DepartamentoHome();
 		
@@ -243,8 +259,23 @@ class EmpleadosStreamTests {
 			List<Departamento> listDep = depHome.findAll();
 			
 			//
+			List<String> lista = listDep.stream()
+					.map(d -> new Departamento(
+							d.getNombre(),
+							d.getPresupuesto(),
+							d.getGastos(),
+							d.getEmpleados()))
+					.map(d -> {
+							d.setPresupuesto(d.getPresupuesto()-d.getGastos());
+							if(d.getPresupuesto()<0)
+								d.setPresupuesto(0);
+							return d;
+					})
+					.sorted(comparing(Departamento::getPresupuesto))
+					.map(d -> "Nombre: " + d.getNombre() + " ,Presupuesto actual: " + d.getPresupuesto())
+					.collect(toList());
 			
-			listDep.forEach(System.out::println);
+			lista.forEach(System.out::println);
 		
 			depHome.commitTransaction();
 		}
@@ -408,7 +439,7 @@ class EmpleadosStreamTests {
 	 * 11. Lista los nombres, apellidos y nif de los empleados que trabajan en los departamentos 2, 4 o 5
 	 */
 	@Test
-	void test11a() {
+	void test11() {
 	
 		EmpleadoHome empHome = new EmpleadoHome();	
 		try {
@@ -534,8 +565,11 @@ class EmpleadosStreamTests {
 			List<Departamento> listDep = depHome.findAll();
 			
 			//
+			/*List<String> lista = listDep.stream()
+					.map(d -> d.getEmpleados())
+					.count();*/
 			
-			listDep.forEach(System.out::println);
+			//lista.forEach(System.out::println);
 		
 			depHome.commitTransaction();
 		}
